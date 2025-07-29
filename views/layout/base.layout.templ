@@ -1,0 +1,64 @@
+package layout
+
+import (
+	"fmt"
+	"context"
+)
+
+type contextKey string
+
+const VersionHashKey contextKey = "version-hash"
+
+func getHashVersion(ctx context.Context) string {
+	if hash, ok := ctx.Value(VersionHashKey).(string); ok {
+		return hash
+	}
+	return ""
+}
+
+templ Base() {
+	{{ hash := getHashVersion(ctx) }}
+	<!DOCTYPE html>
+	<html lang="en" class="dark font-DMMono">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<meta name="description" content=""/>
+			<meta name="google" content="notranslate"/>
+			<link rel="shortcut icon" href="/static/img/templ.png" type="image/png"/>
+			<link rel="stylesheet" href={ fmt.Sprintf("/static/css/main%s.css", hash) } type="text/css"/>
+			<script src={ fmt.Sprintf("/static/js/htmx%s.min.js", hash) }></script>
+			<script src={ fmt.Sprintf("/static/js/hyperscript%s.org@0.9.13.js", hash) }></script>
+			<script src={ fmt.Sprintf("/static/js/franken2%s.core.iife.js", hash) } type="module"></script>
+			<script src={ fmt.Sprintf("/static/js/franken2%s.icon.iife.js", hash) } type="module"></script>
+			<script src={ fmt.Sprintf("/static/js/sweetalert2%s.min.js", hash) }></script>
+			<script src={ fmt.Sprintf("/static/js/sortable%s.js", hash) }></script>
+			<script src={ fmt.Sprintf("/static/js/main%s.js", hash) }></script>
+			<script>
+                  const htmlElement = document.documentElement;
+
+                  const __FRANKEN__ = JSON.parse(
+                    localStorage.getItem("__FRANKEN__") || "{}",
+                  );
+
+                  if (
+                    __FRANKEN__.mode === "dark" ||
+                    (!__FRANKEN__.mode &&
+                      window.matchMedia("(prefers-color-scheme: dark)").matches)
+                  ) {
+                    htmlElement.classList.add("dark");
+                  } else {
+                    htmlElement.classList.remove("dark");
+                  }
+
+                  htmlElement.classList.add(__FRANKEN__.theme || "uk-theme-emerald");
+                  htmlElement.classList.add(__FRANKEN__.radii || "uk-radii-none");
+                  htmlElement.classList.add(__FRANKEN__.shadows || "uk-shadows-sm");
+                  htmlElement.classList.add(__FRANKEN__.font || "uk-font-sm");
+            </script>
+		</head>
+		<body class="bg-background text-foreground sample-transition" hx-boost="true">
+			{ children... }
+		</body>
+	</html>
+}

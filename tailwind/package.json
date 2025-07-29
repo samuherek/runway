@@ -1,0 +1,22 @@
+{
+  "name": "runway",
+  "version": "0.1.0",
+  "description": "Go/Echo+Templ+Htmx: Full stack application using Golang's Echo framework & Templ templating language with user session management + CRUD to a SQLite database (To Do List) and HTMX in the frontend",
+  "main": "index.js",
+  "scripts": {
+    "watch-css": "npx tailwindcss -i input.css -o ../static/css/main.css --watch",
+    "build-css-prod": "npx tailwindcss -i input.css -o ../static/css/main.css --minify"
+  },
+  "keywords": [],
+  "author": "emarifer",
+  "license": "MIT",
+  "devDependencies": {
+    "daisyui": "^4.10.2",
+    "tailwindcss": "^3.4.3"
+  },
+  "dependencies": {
+    "franken-ui": "internal",
+    "postcss": "^8.5.1"
+  }
+}
+

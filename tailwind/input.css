@@ -1,0 +1,20 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: 'DMMono';
+    font-weight: normal;
+    src: url("/static/fonts/DMMono-Regular.ttf") format("truetype");
+}
+
+
+html {
+    font-family: 'DMMono';
+}
+
+:root {
+    --uk-alert-padding: 0.5rem 0.75rem;
+}
+

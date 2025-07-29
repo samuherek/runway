@@ -1,0 +1,9 @@
+tmp
+bin
+
+**/*_temp.go
+**/*_templ.txt
+static/css/main.css
+**/node_modules
+**.db
+

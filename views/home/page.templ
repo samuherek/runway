@@ -1,0 +1,17 @@
+package home 
+
+import (
+	"runway/views/layout"
+)
+
+templ Home() {
+	<div>
+		Hellow
+	</div>
+}
+
+templ Page(cmp templ.Component) {
+	@layout.Base() {
+		@cmp
+	}
+}
