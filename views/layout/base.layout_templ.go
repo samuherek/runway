@@ -46,7 +46,7 @@ func Base() templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		hash := getHashVersion(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"dark font-DMMono\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta name=\"description\" content=\"\"><meta name=\"google\" content=\"notranslate\"><link rel=\"shortcut icon\" href=\"/static/img/templ.png\" type=\"image/png\"><link rel=\"stylesheet\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"dark font-DMMono bg-background\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><meta name=\"description\" content=\"\"><meta name=\"google\" content=\"notranslate\"><link rel=\"shortcut icon\" href=\"/static/img/templ.png\" type=\"image/png\"><link rel=\"stylesheet\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
