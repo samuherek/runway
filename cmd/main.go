@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"runway/db"
 	"runway/handlers"
 	email "runway/integrations"
 
@@ -25,6 +26,8 @@ func main() {
 	e := echo.New()
 
 	emailS := email.NewEmailService()
+	dbS := db.NewDbService()
+	defer dbS.Close()
 
 	publicH := handlers.NewPublicHandler()
 	authH := handlers.NewAuthHandler(emailS)
