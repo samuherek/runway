@@ -1,0 +1,28 @@
+package auth 
+
+import (
+	"runway/views/layout"
+)
+
+templ RegisterSent() {
+	<header class="flex justify-between items-center p-6">
+		<h1 class="text-2xl font-semibold tracking-tight"><a href="/">RUNWAY</a></h1>
+		<nav class="space-x-4">
+			<a href="/login" class="text-sm font-medium hover:underline">Login</a>
+			<a href="/register" class="text-sm font-medium hover:underline">Create Account</a>
+		</nav>
+	</header>
+	<div class="flex items-center justify-center pt-8">
+		<div class="w-80">
+			<div class="flex flex-col text-center mb-4">
+				<p class="text-sm text-muted-foreground">An email has been sent with link to finish registration</p>
+			</div>
+		</div>
+	</div>
+}
+
+templ RegisterSentPage(cmp templ.Component) {
+	@layout.Base() {
+		@cmp
+	}
+}

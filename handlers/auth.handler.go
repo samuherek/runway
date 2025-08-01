@@ -123,7 +123,8 @@ func (h *AuthHandler) PostRegister(c echo.Context) error {
 
 	// TODO: Redirect to success
 
-	return res()
+	v := auth.RegisterSent()
+	return renderView(c, auth.RegisterSentPage(v))
 }
 
 type RegisterConfirmParams struct {
@@ -267,18 +268,91 @@ func (h *AuthHandler) PostLogin(c echo.Context) error {
 		return res()
 	}
 
+	tokenValue, err := utils.GenerateToken(32)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed token generation")
+		return res()
+	}
+
+	token, err := h.db.Queries.CreateTempToken(ctx, dbgen.CreateTempTokenParams{
+		ID:        uuid.New(),
+		ExpiresAt: time.Now().Add(15 * time.Minute),
+		UserID: uuid.NullUUID{
+			UUID:  user.ID,
+			Valid: true,
+		},
+		Value: tokenValue,
+	})
+
+	if err != nil {
+		log.Error().Err(err).Msg("Failed db create temp token")
+		return res()
+	}
+
+	if err := h.email.Login(input.Email, token.Value); err != nil {
+		log.Error().Err(err).Msg("Failed email sending")
+		return res()
+	}
+
+	v := auth.LoginSent()
+	return renderView(c, auth.LoginSentPage(v))
+}
+
+type LoginConfirmParams struct {
+	Token string `query:"token" validate:"required,min=40,max=100`
+}
+
+func (h *AuthHandler) GetLoginConfirm(c echo.Context) error {
+	var params LoginConfirmParams
+	ctx := c.Request().Context()
+
+	if err := c.Bind(&params); err != nil {
+		log.Error().Err(err).Msg("Failed input binding")
+		return renderView(c, auth.LoginConfirmPage(auth.LoginConfirmError("Unexpected error.")))
+	}
+
+	if err := c.Validate(&params); err != nil {
+		return renderView(c, auth.LoginConfirmPage(auth.LoginConfirmError("Incorrect token")))
+	}
+
+	token, err := h.db.Queries.GetTempToken(ctx, params.Token)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return renderView(c, auth.LoginConfirmPage(auth.LoginConfirmError("Does not look like valid token")))
+		}
+		return renderView(c, auth.LoginConfirmPage(auth.LoginConfirmError("Unexpected error")))
+	}
+
+	if !token.UserID.Valid {
+		return renderView(c, auth.LoginConfirmPage(auth.LoginConfirmError("Sorry. This token does not look right.")))
+	}
+
+	if token.Used {
+		return renderView(c, auth.LoginConfirmPage(auth.LoginConfirmError("Sorry but this token has been used already. Try again.")))
+	}
+
+	if time.Now().After(token.ExpiresAt) {
+		return renderView(c, auth.LoginConfirmPage(auth.LoginConfirmError("Sorry but this token expired. Try again.")))
+	}
+
+	// if something happens here, we basically discard the token and make the user do it again
+	if _, err := h.db.Queries.SetTempTokenUsed(ctx, token.Value); err != nil {
+		log.Error().Err(err).Msg("Failed db setting token")
+		return renderView(c, auth.LoginConfirmPage(auth.LoginConfirmError("Unexpected error")))
+	}
+
 	sessionToken, err := utils.GenerateToken(32)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed token generation")
-		return renderView(c, auth.RegisterConfirmPage(auth.RegisterConfirmError("Unexpected error")))
+		return renderView(c, auth.LoginConfirmPage(auth.LoginConfirmError("Unexpected error")))
 	}
 
 	ua := c.Request().UserAgent()
 	ip := c.RealIP()
 
-	session, _ := h.db.Queries.CreateSession(ctx, dbgen.CreateSessionParams{
+	session, err := h.db.Queries.CreateSession(ctx, dbgen.CreateSessionParams{
 		ID:     uuid.New(),
-		UserID: user.ID,
+		UserID: token.UserID.UUID,
 		Token:  sessionToken,
 		IpAddress: sql.NullString{
 			String: ip,
@@ -290,6 +364,11 @@ func (h *AuthHandler) PostLogin(c echo.Context) error {
 		},
 		ExpiresAt: time.Now().Add(30 * 24 * time.Hour), // 30 days
 	})
+
+	if err != nil {
+		log.Error().Err(err).Msg("Failed commit transaction")
+		return renderView(c, auth.LoginConfirmPage(auth.LoginConfirmError("Unexpected error")))
+	}
 
 	cookie := &http.Cookie{
 		Name:     a.COOKIE_SESSION,

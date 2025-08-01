@@ -59,6 +59,7 @@ func main() {
 
 	e.GET("/login", authH.GetLogin, auth.RedirectIfAuthenticatedMiddleware(dbS))
 	e.POST("/login", authH.PostLogin, auth.RedirectIfAuthenticatedMiddleware(dbS))
+	e.GET("/login/confirm", authH.GetLoginConfirm, auth.RedirectIfAuthenticatedMiddleware(dbS))
 	e.GET("/register", authH.GetRegister, auth.RedirectIfAuthenticatedMiddleware(dbS))
 	e.POST("/register", authH.PostRegister, auth.RedirectIfAuthenticatedMiddleware(dbS))
 	e.GET("/register/confirm", authH.GetRegisterConfirm, auth.RedirectIfAuthenticatedMiddleware(dbS))

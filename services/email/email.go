@@ -2,16 +2,19 @@ package email
 
 import (
 	"fmt"
-	"log"
+	l "log"
 	"os"
 
 	"github.com/resend/resend-go/v2"
+	"github.com/rs/zerolog/log"
 )
+
+// TODO: Dynamic links beased on environment
 
 func getEmailKey() string {
 	env, ok := os.LookupEnv("APP_EMAIL_KEY")
 	if !ok {
-		log.Fatal("ERROR: Failed to load APP_EMAIL_KEY.")
+		l.Fatal("ERROR: Failed to load APP_EMAIL_KEY.")
 	}
 	return env
 }
@@ -34,12 +37,31 @@ func (s *EmailService) Register(email, token string) error {
 		From:    "noreply@rway.app",
 		To:      []string{email},
 		Subject: "Let's register you",
-		Html:    fmt.Sprintf("<p>Thanks for trying out RUNWAY. Before we can proceed, please register by clicking the link below!</p><p><a href='http://localhost:5432/register/confirm?token=%s'>TO BE LINK!</a></p>", token),
+		Html:    fmt.Sprintf("<p>Thanks for trying out RUNWAY. Before we can proceed, please register by clicking the link below!</p><p><a href='http://localhost:1234/register/confirm?token=%s'>TO BE LINK!</a></p>", token),
 	}
 
 	_, err := s.client.Emails.Send(params)
+
 	if err != nil {
-		fmt.Printf("EMAIL: Register email sent\n")
+		log.Error().Err(err).Msg("Failed sending register email")
 	}
+
+	return err
+}
+
+func (s *EmailService) Login(email, token string) error {
+	params := &resend.SendEmailRequest{
+		From:    "noreply@rway.app",
+		To:      []string{email},
+		Subject: "Let's log you in",
+		Html:    fmt.Sprintf("<p><p>Here is your login link ;) <a href='http://localhost:1234/login/confirm?token=%s'>TO BE LINK!</a></p>", token),
+	}
+
+	_, err := s.client.Emails.Send(params)
+
+	if err != nil {
+		log.Error().Err(err).Msg("Failed sending login email")
+	}
+
 	return err
 }

@@ -1,0 +1,28 @@
+package auth 
+
+import (
+	"runway/views/layout"
+)
+
+templ LoginConfirmError(msg string) {
+	<header class="flex justify-between items-center p-6">
+		<h1 class="text-2xl font-semibold tracking-tight"><a href="/">RUNWAY</a></h1>
+	</header>
+	<div class="flex items-center justify-center pt-8">
+		<div class="w-80">
+			<div class="flex flex-col text-center mb-4">
+				<h3 class="text-muted-foreground">You are awesome, but...!</h3>
+				<p>{ msg }</p>
+			</div>
+			<div>
+				<a href="/" class="uk-btn uk-btn-pirmary">I want to go home!</a>
+			</div>
+		</div>
+	</div>
+}
+
+templ LoginConfirmPage(cmp templ.Component) {
+	@layout.Base() {
+		@cmp
+	}
+}
