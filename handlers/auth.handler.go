@@ -35,92 +35,93 @@ type RegisterInput struct {
 	Email string `form:"email" validate:"required,email"`
 }
 
-func (h *AuthHandler) Register(c echo.Context) error {
+func (h *AuthHandler) GetRegister(c echo.Context) error {
+	view := auth.Register()
+	return renderView(c, auth.RegisterPage(view))
+}
+
+func (h *AuthHandler) PostRegister(c echo.Context) error {
+	var input RegisterInput
+
 	res := func() error {
 		view := auth.Register()
 		return renderView(c, auth.RegisterPage(view))
 	}
 
-	if c.Request().Method == "POST" {
-		var input RegisterInput
-
-		if err := c.Bind(&input); err != nil {
-			log.Error().Err(err).Msg("Failed input binding")
-			return res()
-		}
-
-		if err := c.Validate(&input); err != nil {
-			// TODO: Report to UI
-			fmt.Printf("Validation failed: %v\n", err)
-			return res()
-		}
-
-		log.Info().Msgf("Email is now, %v", input.Email)
-
-		_, err := h.db.Queries.GetUserByEmail(c.Request().Context(), input.Email)
-
-		if err == nil {
-			// TODO:: Message to UI that user already exists
-			// TODO: CHeck if the user is verified. If yes, then it is an error otherwise, resend the registration link again. Probably expired
-			return res()
-		}
-
-		if !errors.Is(err, sql.ErrNoRows) {
-			log.Error().Err(err).Msg("Failed db query")
-			return res()
-		}
-
-		tx, err := h.db.BeginTx(c.Request().Context())
-		if err != nil {
-			log.Error().Err(err).Msg("Failed creating tx")
-			return res()
-		}
-
-		qtx := dbgen.New(tx)
-
-		user, err := qtx.CreateUser(c.Request().Context(), dbgen.CreateUserParams{
-			ID:    uuid.New(),
-			Email: input.Email,
-		})
-
-		if err != nil {
-			log.Error().Err(err).Msg("Failed db create user")
-			return res()
-		}
-
-		tokenValue, err := utils.GenerateToken(32)
-		if err != nil {
-			log.Error().Err(err).Msg("Failed token generation")
-			return res()
-		}
-
-		token, err := qtx.CreateTempToken(c.Request().Context(), dbgen.CreateTempTokenParams{
-			ID:        uuid.New(),
-			ExpiresAt: time.Now().Add(15 * time.Minute),
-			UserID: uuid.NullUUID{
-				UUID:  user.ID,
-				Valid: true,
-			},
-			Value: tokenValue,
-		})
-
-		if err != nil {
-			log.Error().Err(err).Msg("Failed db create temp token")
-			return res()
-		}
-
-		if err := tx.Commit(); err != nil {
-			log.Error().Err(err).Msg("Failed commit transaction")
-			return res()
-		}
-
-		if err := h.email.Register(input.Email, token.Value); err != nil {
-			log.Error().Err(err).Msg("Failed email sending")
-			return res()
-		}
-
-		// TODO: Redirect to success
+	if err := c.Bind(&input); err != nil {
+		log.Error().Err(err).Msg("Failed input binding")
+		return res()
 	}
+
+	if err := c.Validate(&input); err != nil {
+		// TODO: Report to UI
+		fmt.Printf("Validation failed: %v\n", err)
+		return res()
+	}
+
+	_, err := h.db.Queries.GetUserByEmail(c.Request().Context(), input.Email)
+
+	if err == nil {
+		// TODO:: Message to UI that user already exists
+		// TODO: CHeck if the user is verified. If yes, then it is an error otherwise, resend the registration link again. Probably expired
+		return res()
+	}
+
+	if !errors.Is(err, sql.ErrNoRows) {
+		log.Error().Err(err).Msg("Failed db query")
+		return res()
+	}
+
+	tx, err := h.db.BeginTx(c.Request().Context())
+	if err != nil {
+		log.Error().Err(err).Msg("Failed creating tx")
+		return res()
+	}
+
+	qtx := dbgen.New(tx)
+
+	user, err := qtx.CreateUser(c.Request().Context(), dbgen.CreateUserParams{
+		ID:    uuid.New(),
+		Email: input.Email,
+	})
+
+	if err != nil {
+		log.Error().Err(err).Msg("Failed db create user")
+		return res()
+	}
+
+	tokenValue, err := utils.GenerateToken(32)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed token generation")
+		return res()
+	}
+
+	token, err := qtx.CreateTempToken(c.Request().Context(), dbgen.CreateTempTokenParams{
+		ID:        uuid.New(),
+		ExpiresAt: time.Now().Add(15 * time.Minute),
+		UserID: uuid.NullUUID{
+			UUID:  user.ID,
+			Valid: true,
+		},
+		Value: tokenValue,
+	})
+
+	if err != nil {
+		log.Error().Err(err).Msg("Failed db create temp token")
+		return res()
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Error().Err(err).Msg("Failed commit transaction")
+		return res()
+	}
+
+	if err := h.email.Register(input.Email, token.Value); err != nil {
+		log.Error().Err(err).Msg("Failed email sending")
+		return res()
+	}
+
+	// TODO: Redirect to success
 
 	return res()
 }
@@ -129,7 +130,7 @@ type RegisterConfirmParams struct {
 	Token string `query:"token" validate:"required,min=40,max=100`
 }
 
-func (h *AuthHandler) RegisterConfirm(c echo.Context) error {
+func (h *AuthHandler) GetRegisterConfirm(c echo.Context) error {
 	var params RegisterConfirmParams
 	ctx := c.Request().Context()
 
@@ -186,7 +187,6 @@ func (h *AuthHandler) RegisterConfirm(c echo.Context) error {
 		},
 	})
 
-	// TODO:: Generate session token
 	sessionToken, err := utils.GenerateToken(32)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed token generation")
@@ -232,12 +232,82 @@ func (h *AuthHandler) RegisterConfirm(c echo.Context) error {
 	return renderView(c, auth.RegisterConfirmPage(auth.RegisterConfirm()))
 }
 
-func (h *AuthHandler) Login(c echo.Context) error {
+func (h *AuthHandler) GetLogin(c echo.Context) error {
 	view := auth.Login()
 	return renderView(c, auth.LoginPage(view))
 }
 
-func (h *AuthHandler) Logout(c echo.Context) error {
+type LoginInput struct {
+	Email string `form:"email" validate:"required,email"`
+}
+
+func (h *AuthHandler) PostLogin(c echo.Context) error {
+	var input LoginInput
+	ctx := c.Request().Context()
+
+	res := func() error {
+		view := auth.Login()
+		return renderView(c, auth.LoginPage(view))
+	}
+
+	if err := c.Bind(&input); err != nil {
+		log.Error().Err(err).Msg("Failed input binding")
+		return res()
+	}
+
+	if err := c.Validate(&input); err != nil {
+		// TODO: Report to UI
+		fmt.Printf("Validation failed: %v\n", err)
+		return res()
+	}
+
+	user, err := h.db.Queries.GetUserVerified(ctx, input.Email)
+	if err != nil {
+		// TODO: Show UI error as missing user
+		return res()
+	}
+
+	sessionToken, err := utils.GenerateToken(32)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed token generation")
+		return renderView(c, auth.RegisterConfirmPage(auth.RegisterConfirmError("Unexpected error")))
+	}
+
+	ua := c.Request().UserAgent()
+	ip := c.RealIP()
+
+	session, _ := h.db.Queries.CreateSession(ctx, dbgen.CreateSessionParams{
+		ID:     uuid.New(),
+		UserID: user.ID,
+		Token:  sessionToken,
+		IpAddress: sql.NullString{
+			String: ip,
+			Valid:  ip != "",
+		},
+		UserAgent: sql.NullString{
+			String: ua,
+			Valid:  ua != "",
+		},
+		ExpiresAt: time.Now().Add(30 * 24 * time.Hour), // 30 days
+	})
+
+	cookie := &http.Cookie{
+		Name:     a.COOKIE_SESSION,
+		Value:    session.Token,
+		Path:     "/",
+		Expires:  session.ExpiresAt, // 30 days
+		HttpOnly: true,
+		// TODO: This depends on the environment!!!!!!
+		Secure:   false, // set to false if you're developing over HTTP
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	c.SetCookie(cookie)
+
+	return c.Redirect(http.StatusSeeOther, "/a")
+}
+
+func (h *AuthHandler) GetLogout(c echo.Context) error {
 	cookie, err := c.Cookie(a.COOKIE_SESSION)
 	ctx := c.Request().Context()
 	userId := c.Get(a.USER_ID).(*uuid.UUID)

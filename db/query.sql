@@ -8,6 +8,9 @@ select * from users where email = $1;
 -- name: CreateUser :one
 insert into users(id, email) values($1, $2) returning *;
 
+-- name: GetUserVerified :one
+select * from users where email = $1 and verified_at is not null;
+
 -- name: SetUserVerified :one
 update users set verified_at = $2 where id = $1 returning *;
 

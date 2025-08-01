@@ -171,6 +171,22 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 	return i, err
 }
 
+const getUserVerified = `-- name: GetUserVerified :one
+select id, email, verified_at, created_at from users where email = $1 and verified_at is not null
+`
+
+func (q *Queries) GetUserVerified(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserVerified, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.VerifiedAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const removeSessionByToken = `-- name: RemoveSessionByToken :exec
 delete from sessions where token = $1 and user_id = $2
 `

@@ -42,9 +42,6 @@ func AuthMiddleware(db *db.DbService) echo.MiddlewareFunc {
 			cookie, err := c.Cookie(COOKIE_SESSION)
 
 			if err != nil || cookie.Value == "" {
-				if err != nil {
-					log.Error().Err(err).Msg("Failed getting cookie")
-				}
 				return c.Redirect(http.StatusSeeOther, "/login")
 			}
 
@@ -74,10 +71,6 @@ func RedirectIfAuthenticatedMiddleware(db *db.DbService) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			cookie, err := c.Cookie(COOKIE_SESSION)
-
-			if err != nil {
-				log.Error().Err(err).Msg("Failed getting cookie")
-			}
 
 			if err == nil && cookie.Value != "" {
 				user := getSessionUser(c, db, cookie.Value)
