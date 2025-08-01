@@ -33,7 +33,7 @@ func Home() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<header class=\"flex justify-between items-center p-6\"><h1 class=\"text-2xl font-semibold tracking-tight\">RUNWAY</h1></header><main class=\"flex-grow flex items-center justify-center px-6 py-24\"><div class=\"max-w-3xl text-center\"><h2 class=\"text-4xl sm:text-5xl font-bold tracking-tight leading-tight\">You are now super logged in!</h2></div></main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<header class=\"flex justify-between items-center p-6\"><h1 class=\"text-2xl font-semibold tracking-tight\">RUNWAY</h1><nav class=\"space-x-4\"><a href=\"/a/logout\" class=\"text-sm font-medium hover:underline\">Logout</a></nav></header><main class=\"flex-grow flex items-center justify-center px-6 py-24\"><div class=\"max-w-3xl text-center\"><h2 class=\"text-4xl sm:text-5xl font-bold tracking-tight leading-tight\">You are now super logged in!</h2></div></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

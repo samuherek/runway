@@ -11,6 +11,7 @@ import (
 	"runway/services/email"
 	"runway/utils"
 	"runway/views/auth"
+	"runway/views/error_views"
 	"time"
 
 	"github.com/google/uuid"
@@ -234,4 +235,35 @@ func (h *AuthHandler) RegisterConfirm(c echo.Context) error {
 func (h *AuthHandler) Login(c echo.Context) error {
 	view := auth.Login()
 	return renderView(c, auth.LoginPage(view))
+}
+
+func (h *AuthHandler) Logout(c echo.Context) error {
+	cookie, err := c.Cookie(a.COOKIE_SESSION)
+	ctx := c.Request().Context()
+	userId := c.Get(a.USER_ID).(*uuid.UUID)
+
+	if err != nil {
+		log.Error().Err(err).Msg("Failed getting cookie")
+		return renderView(c, error_views.Error500())
+	}
+
+	// At this point, we assume we have the token in the cookie, as it passed the auth middlware
+	if err := h.db.Queries.RemoveSessionByToken(ctx, dbgen.RemoveSessionByTokenParams{
+		Token:  cookie.Value,
+		UserID: *userId,
+	}); err != nil {
+		log.Error().Err(err).Msg("Failed removing session")
+		return renderView(c, error_views.Error500())
+	}
+
+	c.SetCookie(&http.Cookie{
+		Name:     a.COOKIE_SESSION,
+		Value:    "",
+		Path:     "/",
+		Expires:  time.Unix(0, 0),
+		MaxAge:   -1,
+		HttpOnly: true,
+	})
+
+	return c.Redirect(http.StatusSeeOther, "/")
 }

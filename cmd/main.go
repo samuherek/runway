@@ -57,7 +57,7 @@ func main() {
 	e.Static("/static", "static")
 	e.GET("/", publicH.Index)
 
-	e.GET("/login", authH.Login)
+	e.GET("/login", authH.Login, auth.RedirectIfAuthenticatedMiddleware(dbS))
 	e.GET("/register", authH.Register, auth.RedirectIfAuthenticatedMiddleware(dbS))
 	e.POST("/register", authH.Register, auth.RedirectIfAuthenticatedMiddleware(dbS))
 	e.GET("/register/confirm", authH.RegisterConfirm, auth.RedirectIfAuthenticatedMiddleware(dbS))
@@ -65,6 +65,7 @@ func main() {
 	a := e.Group("/a")
 	a.Use(auth.AuthMiddleware(dbS))
 	a.GET("", appH.Home)
+	a.GET("/logout", authH.Logout)
 	a.GET("/*", func(c echo.Context) error {
 		return c.Redirect(http.StatusFound, "/a")
 	})

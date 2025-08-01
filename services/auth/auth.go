@@ -50,10 +50,20 @@ func AuthMiddleware(db *db.DbService) echo.MiddlewareFunc {
 
 			user := getSessionUser(c, db, cookie.Value)
 			if user == nil {
+
+				c.SetCookie(&http.Cookie{
+					Name:     COOKIE_SESSION,
+					Value:    "",
+					Path:     "/",
+					Expires:  time.Unix(0, 0),
+					MaxAge:   -1,
+					HttpOnly: true,
+				})
+
 				return c.Redirect(http.StatusSeeOther, "/login")
 			}
 
-			c.Set(USER_ID, user.ID)
+			c.Set(USER_ID, user)
 
 			return next(c)
 		}
@@ -75,6 +85,7 @@ func RedirectIfAuthenticatedMiddleware(db *db.DbService) echo.MiddlewareFunc {
 					return c.Redirect(http.StatusSeeOther, "/a")
 				}
 			}
+
 			return next(c)
 		}
 	}

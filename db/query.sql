@@ -25,3 +25,7 @@ insert into sessions(id, user_id, token, ip_address, user_agent, expires_at) val
 
 -- name: GetSessionByToken :one
 select * from sessions where token = $1 and expires_at > $2;
+
+-- name: RemoveSessionByToken :exec
+delete from sessions where token = $1 and user_id = $2;
+

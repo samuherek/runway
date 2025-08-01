@@ -171,6 +171,20 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 	return i, err
 }
 
+const removeSessionByToken = `-- name: RemoveSessionByToken :exec
+delete from sessions where token = $1 and user_id = $2
+`
+
+type RemoveSessionByTokenParams struct {
+	Token  string
+	UserID uuid.UUID
+}
+
+func (q *Queries) RemoveSessionByToken(ctx context.Context, arg RemoveSessionByTokenParams) error {
+	_, err := q.db.ExecContext(ctx, removeSessionByToken, arg.Token, arg.UserID)
+	return err
+}
+
 const setTempTokenUsed = `-- name: SetTempTokenUsed :one
 update temp_tokens set used = true where value = $1 returning id, expires_at, user_id, value, used
 `
