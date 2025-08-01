@@ -1,11 +1,13 @@
 package db
 
 import (
+	"context"
 	"database/sql"
-	_ "github.com/jackc/pgx/v5/stdlib"
 	"log"
 	"os"
 	"runway/db/dbgen"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func getDatabaseUrl() string {
@@ -21,14 +23,13 @@ func openConnection(url string) *sql.DB {
 	if err != nil {
 		log.Fatalf("Failed to connect DB: %v", err)
 	}
-	defer db.Close()
 
 	return db
 }
 
 type DbService struct {
 	pool    *sql.DB
-	queries *dbgen.Queries
+	Queries *dbgen.Queries
 }
 
 func NewDbService() *DbService {
@@ -41,10 +42,14 @@ func NewDbService() *DbService {
 
 	return &DbService{
 		pool:    db,
-		queries: queries,
+		Queries: queries,
 	}
 }
 
-func (dbs *DbService) Close() error {
-	return dbs.pool.Close()
+func (s *DbService) BeginTx(ctx context.Context) (*sql.Tx, error) {
+	return s.pool.BeginTx(ctx, nil)
+}
+
+func (s *DbService) Close() error {
+	return s.pool.Close()
 }

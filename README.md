@@ -29,3 +29,11 @@ npm run watch-css
 NONE SO FAR
 ```
 
+
+### DB
+
+Using `migrate` with necessary ENV variable `export POSTGRESQL_URL=postgres://postgres:password@localhost:5432/runway?sslmode=disable`
+
+- Drop database `migrate --database ${POSTGRESQL_URL} -path db/migrations drop` 
+- Migrate up `migrate --database ${POSTGRESQL_URL} -path db/migrations up` 
+- Create migration `migrate create -ext sql -dir db/migrations -seq create_users_table`

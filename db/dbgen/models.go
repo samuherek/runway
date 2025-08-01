@@ -26,6 +26,7 @@ type TempToken struct {
 	ID        uuid.UUID
 	ExpiresAt time.Time
 	UserID    uuid.NullUUID
+	Value     string
 	Used      sql.NullBool
 }
 

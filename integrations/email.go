@@ -29,12 +29,12 @@ func NewEmailService() *EmailService {
 	}
 }
 
-func (s *EmailService) Register(email string) error {
+func (s *EmailService) Register(email, token string) error {
 	params := &resend.SendEmailRequest{
 		From:    "noreply@rway.app",
 		To:      []string{email},
 		Subject: "Let's register you",
-		Html:    "<p>Thanks for trying out RUNWAY. Before we can proceed, please register by clicking the link below!</p><p><a href=''>TO BE LINK!</a></p>",
+		Html:    fmt.Sprintf("<p>Thanks for trying out RUNWAY. Before we can proceed, please register by clicking the link below!</p><p><a href='http://localhost:5432/register/confirm?token=%s'>TO BE LINK!</a></p>", token),
 	}
 
 	_, err := s.client.Emails.Send(params)

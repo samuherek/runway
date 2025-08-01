@@ -7,9 +7,60 @@ package dbgen
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
+
+const createTempToken = `-- name: CreateTempToken :one
+insert into temp_tokens(id, expires_at, user_id, value) values($1, $2, $3, $4) returning id, expires_at, user_id, value, used
+`
+
+type CreateTempTokenParams struct {
+	ID        uuid.UUID
+	ExpiresAt time.Time
+	UserID    uuid.NullUUID
+	Value     string
+}
+
+func (q *Queries) CreateTempToken(ctx context.Context, arg CreateTempTokenParams) (TempToken, error) {
+	row := q.db.QueryRowContext(ctx, createTempToken,
+		arg.ID,
+		arg.ExpiresAt,
+		arg.UserID,
+		arg.Value,
+	)
+	var i TempToken
+	err := row.Scan(
+		&i.ID,
+		&i.ExpiresAt,
+		&i.UserID,
+		&i.Value,
+		&i.Used,
+	)
+	return i, err
+}
+
+const createUser = `-- name: CreateUser :one
+insert into users(id, email) values($1, $2) returning id, email, verified_at, created_at
+`
+
+type CreateUserParams struct {
+	ID    uuid.UUID
+	Email string
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, createUser, arg.ID, arg.Email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.VerifiedAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
 
 const getUser = `-- name: GetUser :one
 SELECT id, email, verified_at, created_at FROM users WHERE id = $1
@@ -17,6 +68,22 @@ SELECT id, email, verified_at, created_at FROM users WHERE id = $1
 
 func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUser, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.VerifiedAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getUserByEmail = `-- name: GetUserByEmail :one
+select id, email, verified_at, created_at from users where email = $1
+`
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
 	var i User
 	err := row.Scan(
 		&i.ID,
