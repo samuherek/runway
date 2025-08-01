@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"net/http"
 	"runway/db"
 	"runway/db/dbgen"
 	"runway/integrations"
@@ -58,6 +59,7 @@ func (h *AuthHandler) Register(c echo.Context) error {
 
 		if err == nil {
 			// TODO:: Message to UI that user already exists
+			// TODO: CHeck if the user is verified. If yes, then it is an error otherwise, resend the registration link again. Probably expired
 			return res()
 		}
 
@@ -119,6 +121,113 @@ func (h *AuthHandler) Register(c echo.Context) error {
 	}
 
 	return res()
+}
+
+type RegisterConfirmParams struct {
+	Token string `query:"token" validate:"required,min=40,max=100`
+}
+
+func (h *AuthHandler) RegisterConfirm(c echo.Context) error {
+	var params RegisterConfirmParams
+	ctx := c.Request().Context()
+
+	if err := c.Bind(&params); err != nil {
+		log.Error().Err(err).Msg("Failed input binding")
+		return renderView(c, auth.RegisterConfirmPage(auth.RegisterConfirmError("Does not look like valid link")))
+	}
+
+	if err := c.Validate(&params); err != nil {
+		return renderView(c, auth.RegisterConfirmPage(auth.RegisterConfirmError("Does not look like valid link")))
+	}
+
+	token, err := h.db.Queries.GetTempToken(ctx, params.Token)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return renderView(c, auth.RegisterConfirmPage(auth.RegisterConfirmError("Does not look like valid token")))
+		}
+		return renderView(c, auth.RegisterConfirmPage(auth.RegisterConfirmError("Unexpected error")))
+	}
+
+	if !token.UserID.Valid {
+		return renderView(c, auth.RegisterConfirmPage(auth.RegisterConfirmError("Sorry. This token does not look right.")))
+	}
+
+	if token.Used {
+		return renderView(c, auth.RegisterConfirmPage(auth.RegisterConfirmError("Sorry but this token has been used already. Try again.")))
+	}
+
+	if time.Now().After(token.ExpiresAt) {
+		return renderView(c, auth.RegisterConfirmPage(auth.RegisterConfirmError("Sorry but this token expired. Try again.")))
+	}
+
+	// Without transaction
+	// - mark the token as used
+	// if something happens here, we basically discard the token and make the user do it again
+	if _, err := h.db.Queries.SetTempTokenUsed(ctx, token.Value); err != nil {
+		log.Error().Err(err).Msg("Failed db setting token")
+		return renderView(c, auth.RegisterConfirmPage(auth.RegisterConfirmError("Unexpected error")))
+	}
+
+	tx, err := h.db.BeginTx(ctx)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed creating tx")
+		return renderView(c, auth.RegisterConfirmPage(auth.RegisterConfirmError("Unexpected error")))
+	}
+
+	qtx := dbgen.New(tx)
+
+	qtx.SetUserVerified(ctx, dbgen.SetUserVerifiedParams{
+		ID: token.UserID.UUID,
+		VerifiedAt: sql.NullTime{
+			Time:  time.Now(),
+			Valid: true,
+		},
+	})
+
+	// TODO:: Generate session token
+	sessionToken, err := utils.GenerateToken(32)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed token generation")
+		return renderView(c, auth.RegisterConfirmPage(auth.RegisterConfirmError("Unexpected error")))
+	}
+
+	ua := c.Request().UserAgent()
+	ip := c.RealIP()
+
+	session, _ := qtx.CreateSession(ctx, dbgen.CreateSessionParams{
+		ID:     uuid.New(),
+		UserID: token.UserID.UUID,
+		Token:  sessionToken,
+		IpAddress: sql.NullString{
+			String: ip,
+			Valid:  ip != "",
+		},
+		UserAgent: sql.NullString{
+			String: ua,
+			Valid:  ua != "",
+		},
+		ExpiresAt: time.Now().Add(30 * 24 * time.Hour), // 30 days
+	})
+
+	if err := tx.Commit(); err != nil {
+		log.Error().Err(err).Msg("Failed commit transaction")
+		return renderView(c, auth.RegisterConfirmPage(auth.RegisterConfirmError("Unexpected error")))
+	}
+
+	cookie := &http.Cookie{
+		Name:     "session",
+		Value:    session.Token,
+		Path:     "/",
+		Expires:  session.ExpiresAt, // 30 days
+		HttpOnly: true,
+		// TODO: This depends on the environment!!!!!!
+		Secure:   false, // set to false if you're developing over HTTP
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	c.SetCookie(cookie)
+
+	return renderView(c, auth.RegisterConfirmPage(auth.RegisterConfirm()))
 }
 
 func (h *AuthHandler) Login(c echo.Context) error {

@@ -7,10 +7,46 @@ package dbgen
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+const createSession = `-- name: CreateSession :one
+insert into sessions(id, user_id, token, ip_address, user_agent, expires_at) values($1, $2, $3, $4, $5, $6) returning id, user_id, token, ip_address, user_agent, last_seen_at, expires_at
+`
+
+type CreateSessionParams struct {
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	Token     string
+	IpAddress sql.NullString
+	UserAgent sql.NullString
+	ExpiresAt time.Time
+}
+
+func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error) {
+	row := q.db.QueryRowContext(ctx, createSession,
+		arg.ID,
+		arg.UserID,
+		arg.Token,
+		arg.IpAddress,
+		arg.UserAgent,
+		arg.ExpiresAt,
+	)
+	var i Session
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Token,
+		&i.IpAddress,
+		&i.UserAgent,
+		&i.LastSeenAt,
+		&i.ExpiresAt,
+	)
+	return i, err
+}
 
 const createTempToken = `-- name: CreateTempToken :one
 insert into temp_tokens(id, expires_at, user_id, value) values($1, $2, $3, $4) returning id, expires_at, user_id, value, used
@@ -62,6 +98,23 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const getTempToken = `-- name: GetTempToken :one
+select id, expires_at, user_id, value, used from temp_tokens where value = $1
+`
+
+func (q *Queries) GetTempToken(ctx context.Context, value string) (TempToken, error) {
+	row := q.db.QueryRowContext(ctx, getTempToken, value)
+	var i TempToken
+	err := row.Scan(
+		&i.ID,
+		&i.ExpiresAt,
+		&i.UserID,
+		&i.Value,
+		&i.Used,
+	)
+	return i, err
+}
+
 const getUser = `-- name: GetUser :one
 SELECT id, email, verified_at, created_at FROM users WHERE id = $1
 `
@@ -84,6 +137,44 @@ select id, email, verified_at, created_at from users where email = $1
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.VerifiedAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const setTempTokenUsed = `-- name: SetTempTokenUsed :one
+update temp_tokens set used = true where value = $1 returning id, expires_at, user_id, value, used
+`
+
+func (q *Queries) SetTempTokenUsed(ctx context.Context, value string) (TempToken, error) {
+	row := q.db.QueryRowContext(ctx, setTempTokenUsed, value)
+	var i TempToken
+	err := row.Scan(
+		&i.ID,
+		&i.ExpiresAt,
+		&i.UserID,
+		&i.Value,
+		&i.Used,
+	)
+	return i, err
+}
+
+const setUserVerified = `-- name: SetUserVerified :one
+update users set verified_at = $2 where id = $1 returning id, email, verified_at, created_at
+`
+
+type SetUserVerifiedParams struct {
+	ID         uuid.UUID
+	VerifiedAt sql.NullTime
+}
+
+func (q *Queries) SetUserVerified(ctx context.Context, arg SetUserVerifiedParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, setUserVerified, arg.ID, arg.VerifiedAt)
 	var i User
 	err := row.Scan(
 		&i.ID,

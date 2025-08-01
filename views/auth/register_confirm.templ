@@ -1,0 +1,42 @@
+package auth 
+
+import (
+	"runway/views/layout"
+)
+
+templ RegisterConfirmError(msg string) {
+	<header class="flex justify-between items-center p-6">
+		<h1 class="text-2xl font-semibold tracking-tight"><a href="/">RUNWAY</a></h1>
+	</header>
+	<div class="flex items-center justify-center pt-8">
+		<div class="w-80">
+			<div class="flex flex-col text-center mb-4">
+				<h3 class="text-muted-foreground">You are awesome, but...!</h3>
+				<p>{ msg }</p>
+			</div>
+			<div>
+				<a href="/" class="uk-btn uk-btn-pirmary">I want to go home!</a>
+			</div>
+		</div>
+	</div>
+}
+
+templ RegisterConfirm() {
+	<header class="flex justify-between items-center p-6">
+		<h1 class="text-2xl font-semibold tracking-tight"><a href="/">RUNWAY</a></h1>
+	</header>
+	<div class="flex items-center justify-center pt-8">
+		<div class="w-80">
+			<div class="flex flex-col text-center mb-4">
+				<h3 class="text-muted-foreground">You are awesome!</h3>
+				<p>Thanks for registering. You are all set now. Just go in and start figuring your life out!</p>
+			</div>
+		</div>
+	</div>
+}
+
+templ RegisterConfirmPage(cmp templ.Component) {
+	@layout.Base() {
+		@cmp
+	}
+}

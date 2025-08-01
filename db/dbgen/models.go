@@ -9,14 +9,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/sqlc-dev/pqtype"
 )
 
 type Session struct {
 	ID         uuid.UUID
 	UserID     uuid.UUID
 	Token      string
-	IpAddress  pqtype.Inet
+	IpAddress  sql.NullString
 	UserAgent  sql.NullString
 	LastSeenAt sql.NullTime
 	ExpiresAt  time.Time
@@ -27,7 +26,7 @@ type TempToken struct {
 	ExpiresAt time.Time
 	UserID    uuid.NullUUID
 	Value     string
-	Used      sql.NullBool
+	Used      bool
 }
 
 type User struct {

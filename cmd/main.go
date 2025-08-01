@@ -57,6 +57,7 @@ func main() {
 	e.GET("/login", authH.Login)
 	e.GET("/register", authH.Register)
 	e.POST("/register", authH.Register)
+	e.GET("/register/confirm", authH.RegisterConfirm)
 
 	e.GET("/*", errorH.NotFoundHandler)
 
