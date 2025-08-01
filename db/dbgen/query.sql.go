@@ -98,6 +98,30 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const getSessionByToken = `-- name: GetSessionByToken :one
+select id, user_id, token, ip_address, user_agent, last_seen_at, expires_at from sessions where token = $1 and expires_at > $2
+`
+
+type GetSessionByTokenParams struct {
+	Token     string
+	ExpiresAt time.Time
+}
+
+func (q *Queries) GetSessionByToken(ctx context.Context, arg GetSessionByTokenParams) (Session, error) {
+	row := q.db.QueryRowContext(ctx, getSessionByToken, arg.Token, arg.ExpiresAt)
+	var i Session
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Token,
+		&i.IpAddress,
+		&i.UserAgent,
+		&i.LastSeenAt,
+		&i.ExpiresAt,
+	)
+	return i, err
+}
+
 const getTempToken = `-- name: GetTempToken :one
 select id, expires_at, user_id, value, used from temp_tokens where value = $1
 `

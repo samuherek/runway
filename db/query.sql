@@ -22,3 +22,6 @@ update temp_tokens set used = true where value = $1 returning *;
 
 -- name: CreateSession :one
 insert into sessions(id, user_id, token, ip_address, user_agent, expires_at) values($1, $2, $3, $4, $5, $6) returning *;
+
+-- name: GetSessionByToken :one
+select * from sessions where token = $1 and expires_at > $2;

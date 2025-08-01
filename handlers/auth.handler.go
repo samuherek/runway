@@ -7,7 +7,8 @@ import (
 	"net/http"
 	"runway/db"
 	"runway/db/dbgen"
-	"runway/integrations"
+	a "runway/services/auth"
+	"runway/services/email"
 	"runway/utils"
 	"runway/views/auth"
 	"time"
@@ -215,7 +216,7 @@ func (h *AuthHandler) RegisterConfirm(c echo.Context) error {
 	}
 
 	cookie := &http.Cookie{
-		Name:     "session",
+		Name:     a.COOKIE_SESSION,
 		Value:    session.Token,
 		Path:     "/",
 		Expires:  session.ExpiresAt, // 30 days

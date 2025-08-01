@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"runway/db"
 	"runway/handlers"
-	email "runway/integrations"
+	"runway/services/auth"
+	"runway/services/email"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -45,6 +47,7 @@ func main() {
 
 	publicH := handlers.NewPublicHandler()
 	authH := handlers.NewAuthHandler(emailS, dbS)
+	appH := handlers.NewAppHandler(dbS)
 	errorH := handlers.NewErrorHandler()
 
 	e.Validator = &CustomValidator{validator: validator.New()}
@@ -55,9 +58,16 @@ func main() {
 	e.GET("/", publicH.Index)
 
 	e.GET("/login", authH.Login)
-	e.GET("/register", authH.Register)
-	e.POST("/register", authH.Register)
-	e.GET("/register/confirm", authH.RegisterConfirm)
+	e.GET("/register", authH.Register, auth.RedirectIfAuthenticatedMiddleware(dbS))
+	e.POST("/register", authH.Register, auth.RedirectIfAuthenticatedMiddleware(dbS))
+	e.GET("/register/confirm", authH.RegisterConfirm, auth.RedirectIfAuthenticatedMiddleware(dbS))
+
+	a := e.Group("/a")
+	a.Use(auth.AuthMiddleware(dbS))
+	a.GET("", appH.Home)
+	a.GET("/*", func(c echo.Context) error {
+		return c.Redirect(http.StatusFound, "/a")
+	})
 
 	e.GET("/*", errorH.NotFoundHandler)
 
