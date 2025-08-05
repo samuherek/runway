@@ -112,6 +112,7 @@ func (h *AppHandler) GetRetireProjection(c echo.Context) error {
 
 type PostRetireProjection struct {
 	MonthlyExpenses      float64 `form:"monthlyExpenses" validate:"required,min=1"`
+	MonthlyIncome        float64 `form:"monthlyIncome" validate:"required,min=0"`
 	YearsUntilRetirement int     `form:"yearsUntilRetirement" validate:"required,min=1"`
 	WithdrawalYears      int     `form:"withdrawalYears" validate:"required,min=1"`
 	CurrentSavings       float64 `form:"currentSavings" validate:"required,min=0"`
@@ -137,18 +138,15 @@ func (h *AppHandler) PostRetireProjection(c echo.Context) error {
 
 	input := engine.RetirementInput{
 		MonthlyExpenseToday:  params.MonthlyExpenses,
+		MonthlyIncome:        params.MonthlyIncome,
 		YearsUntilRetirement: params.YearsUntilRetirement,
 		InflationRate:        0.03,
 		WithdrawalYears:      params.WithdrawalYears,
 		CurrentSavings:       params.CurrentSavings,
 	}
 
-	data := engine.ProjectRetirement(input)
+	projection := engine.ProjectRetirement(input)
+	data := engine.RetirementProjectionResult(input, projection)
 
-	fmt.Printf("Monthly expense at retirement start (in future €): %.2f\n", data.MonthlyExpenseAtStart)
-	fmt.Printf("Total required funds at retirement (future €): %.2f\n", data.TotalRequiredFutureFund)
-	fmt.Printf("Total required funds in today's money: %.2f\n", data.TotalRequiredPresentValueFund)
-	fmt.Printf("Current savings coverage (%% of required present value): %.2f%%\n", data.CurrentCoveragePercentage)
-
-	return renderView(c, app.RetireResult())
+	return renderView(c, app.RetireResult(data))
 }

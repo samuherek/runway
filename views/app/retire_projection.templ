@@ -1,7 +1,10 @@
 package app 
 
 import (
+	"fmt"
+
 	"runway/views/layout"
+	"runway/engine"
 )
 
 type RetirePredictPage string
@@ -10,9 +13,30 @@ const (
 	IdResult RetirePredictPage = "retire-project-result"
 )
 
-templ RetireResult() {
+templ RetireResult(data engine.RetirementProjectionData) {
 	<div>
-		<p>Hellow</p>
+		<p>Current monthly expenses: { data.CurrentMonthlyExpenses }</p>
+		<p>Current monthly income: { data.CurrentMonthlyIncome }</p>
+		<p>Years until retirement: { data.YearsUntilRetirement }</p>
+		<p>Years in retirement: { data.YearsInRetirement }</p>
+		<p>Current savings: { data.CurrentSavings }</p>
+		<p>Yearly inflation rate: { data.InflationRate }</p>
+		<p>---</p>
+		<p>Monthly expenses at start: { data.MonthlyExpenseAtStart }</p>
+		<p>Required future fund: { fmt.Sprintf("%.2f",data.RequiredFutureFund) }</p>
+		<p>Required present fund: { data.RequiredPresentFund }</p>
+		<p>Current fullfilmnet percentage: { data.CurrentFullfilmentPercent }</p>
+		<p>Fullfilment months: { data.FulfilmentMonths }</p>
+		<p>---</p>
+		<p>Saving progression</p>
+		for _, v := range data.CurrentSavingsProgressions {
+			<p>{ v.Date.Format("2006-01") } : { v.Value } totals in { fmt.Sprintf("%.2f", v.Sum) } </p>
+		}
+		<p>---</p>
+		<p>Future withdrawals</p>
+		for _, v := range data.FutureFundWithdrawals {
+			<p>{ v.Date.Format("2006-01") } : { fmt.Sprintf("%.2f", v.Sum) } take { v.Value } </p>
+		}
 	</div>
 }
 
@@ -55,6 +79,15 @@ templ RetireProjectForm() {
 				class="uk-input"
 				name="currentSavings"
 				id="currentSavings"
+				type="number"
+			/>
+		</div>
+		<div class="mb-2">
+			<label for="monthlyIncome">Current Monthyl income</label>
+			<input
+				class="uk-input"
+				name="monthlyIncome"
+				id="monthlyIncome"
 				type="number"
 			/>
 		</div>
