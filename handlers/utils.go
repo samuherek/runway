@@ -35,6 +35,12 @@ func isHxReq(c echo.Context) bool {
 	return c.Request().Header.Get("HX-Request") == "true"
 }
 
+func notHxResponse(c echo.Context, n *notifications.Notifications) error {
+	n.AddError("Endpoint allows only HTMX requests")
+	setHxErrors(c, n)
+	return c.NoContent(http.StatusNotFound)
+}
+
 func setHxErrors(c echo.Context, n *notifications.Notifications) {
 	errs, _ := n.JsonErrors()
 	c.Response().Header().Set(string(HxErrors), string(errs))

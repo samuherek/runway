@@ -4,101 +4,24 @@ import (
 	"runway/views/layout"
 )
 
+type SimplePredictPage string
+
+const (
+	IdChart       SimplePredictPage = "simple-predict-chart"
+	IdChartCanvas SimplePredictPage = "simple-predict-chart-canvas"
+	IdChartData   SimplePredictPage = "simple-predict-chart-data"
+)
+
 templ Chart(dates []string, mins, mids, maxs []float64) {
-	<canvas id="rangeChart" width="600" height="400"></canvas>
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
-	<script id="thisScript" data-labels={ templ.JSONString(dates) } data-mins={ templ.JSONString(mins) } data-mids={ templ.JSONString(mids) } data-maxs={ templ.JSONString(maxs) }>
-
-        const s = document.getElementById('thisScript');
-		const labels = JSON.parse(s.getAttribute('data-labels'));		
-        const minValues = JSON.parse(s.getAttribute('data-mins'));;
-        const midValues = JSON.parse(s.getAttribute('data-mids'));;
-        const maxValues = JSON.parse(s.getAttribute('data-maxs'));;
-
-    const data = {
-      labels,
-      datasets: [
-        {
-          label: 'Min',
-          data: minValues,
-          fill: '+1', // fill between this and next dataset
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderWidth: 0,
-          pointRadius: 0,
-          tension: 0.4,
-        },
-        {
-          label: 'Max',
-          data: maxValues,
-          fill: false, // no fill above
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderWidth: 0,
-          pointRadius: 0,
-          tension: 0.4,
-        },
-        {
-          label: 'Mid',
-          data: midValues,
-          borderColor: 'rgba(75, 75, 192, 1)',
-          backgroundColor: 'rgba(75, 75, 192, 0.1)',
-          borderWidth: 2,
-          pointRadius: 3,
-          fill: false,
-          tension: 0.4,
-        }
-      ]
-    };
-
-    const config = {
-      type: 'line',
-      data: data,
-      options: {
-        responsive: true,
-        interaction: {
-          mode: 'index',
-          intersect: false
-        },
-        stacked: false,
-        plugins: {
-          title: {
-            display: true,
-            text: 'Min/Max Area with Mid Line'
-          }
-        },
-        scales: {
-          x: {
-            type: 'time',
-            time: {
-              unit: 'month',
-              displayFormats: {
-                  month: 'MMM yy',
-            }
-            },
-            title: {
-              display: true,
-              text: 'Date'
-            }
-          },
-          y: {
-            title: {
-              display: true,
-              text: 'Value'
-            }
-          }
-        }
-      }
-    };
-
-    new Chart(document.getElementById('rangeChart'), config);
-  </script>
+	<canvas id={ string(IdChartCanvas) } width="600" height="400"></canvas>
+	<script id={ string(IdChartData) } data-labels={ templ.JSONString(dates) } data-mins={ templ.JSONString(mins) } data-mids={ templ.JSONString(mids) } data-maxs={ templ.JSONString(maxs) }></script>
 }
 
 templ SimpleForm() {
 	<form
 		hx-post="/a/simple-prediction"
-		hx-swap="none"
+		hx-target={ "#" + string(IdChart) }
+		hx-swap="innerHTML"
 	>
 		<div class="mb-2">
 			<label for="initialBalance">Initial Balance</label>
@@ -164,6 +87,99 @@ templ SimplePrediction() {
 			</h2>
 		</div>
 		@SimpleForm()
+		<div id={ string(IdChart) }></div>
+		<script data-target={ string(IdChart) } data-data={ string(IdChartData) } data-canvas={ string(IdChartCanvas) }>
+          let chartInstance = null;
+
+          let target = document.currentScript.dataset.target;
+          let targetData = document.currentScript.dataset.data;
+          let targetCanvas = document.currentScript.dataset.canvas;
+
+          document.body.addEventListener("htmx:afterSwap", (e) => {
+            if (!document.getElementById(target)) return; 
+
+            const s = document.getElementById(targetData);
+            if (!s) return;
+
+            const labels = JSON.parse(s.dataset.labels);
+            const minValues = JSON.parse(s.dataset.mins);
+            const midValues = JSON.parse(s.dataset.mids);
+            const maxValues = JSON.parse(s.dataset.maxs);
+
+            const data = {
+              labels,
+              datasets: [
+                {
+                  label: 'Min',
+                  data: minValues,
+                  fill: '+1',
+                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                  borderWidth: 0,
+                  pointRadius: 0,
+                  tension: 0.4,
+                },
+                {
+                  label: 'Max',
+                  data: maxValues,
+                  fill: false,
+                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                  borderWidth: 0,
+                  pointRadius: 0,
+                  tension: 0.4,
+                },
+                {
+                  label: 'Mid',
+                  data: midValues,
+                  borderColor: 'rgba(75, 75, 192, 1)',
+                  backgroundColor: 'rgba(75, 75, 192, 0.1)',
+                  borderWidth: 2,
+                  pointRadius: 3,
+                  fill: false,
+                  tension: 0.4,
+                }
+              ]
+            };
+
+            const config = {
+              type: 'line',
+              data: data,
+              options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                stacked: false,
+                plugins: {
+                  title: {
+                    display: true,
+                    text: 'Min/Max Area with Mid Line'
+                  }
+                },
+                scales: {
+                  x: {
+                    type: 'time',
+                    time: {
+                      unit: 'month',
+                      displayFormats: { month: 'MMM yy' }
+                    },
+                    title: { display: true, text: 'Date' }
+                  },
+                  y: {
+                    title: { display: true, text: 'Value' }
+                  }
+                }
+              }
+            };
+
+            if (chartInstance) {
+              chartInstance.destroy(); // avoid duplicate chart
+            }
+
+            const ctx = document.getElementById(targetCanvas);
+            chartInstance = new Chart(ctx, config);
+          });
+        </script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon"></script>
 	</main>
 }
 

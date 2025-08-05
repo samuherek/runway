@@ -12,6 +12,14 @@ import (
 	"runway/views/layout"
 )
 
+type SimplePredictPage string
+
+const (
+	IdChart       SimplePredictPage = "simple-predict-chart"
+	IdChartCanvas SimplePredictPage = "simple-predict-chart-canvas"
+	IdChartData   SimplePredictPage = "simple-predict-chart-data"
+)
+
 func Chart(dates []string, mins, mids, maxs []float64) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -33,59 +41,85 @@ func Chart(dates []string, mins, mids, maxs []float64) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<canvas id=\"rangeChart\" width=\"600\" height=\"400\"></canvas><script src=\"https://cdn.jsdelivr.net/npm/chart.js\"></script><script src=\"https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js\"></script><script src=\"https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon\"></script><script id=\"thisScript\" data-labels=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<canvas id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(templ.JSONString(dates))
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(string(IdChartCanvas))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 12, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 16, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" data-mins=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" width=\"600\" height=\"400\"></canvas><script id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(templ.JSONString(mins))
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(string(IdChartData))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 12, Col: 99}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 17, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" data-mids=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" data-labels=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(templ.JSONString(mids))
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(templ.JSONString(dates))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 12, Col: 136}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 17, Col: 73}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" data-maxs=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" data-mins=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(templ.JSONString(maxs))
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(templ.JSONString(mins))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 12, Col: 173}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 17, Col: 110}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\">\n\n        const s = document.getElementById('thisScript');\n\t\tconst labels = JSON.parse(s.getAttribute('data-labels'));\t\t\n        const minValues = JSON.parse(s.getAttribute('data-mins'));;\n        const midValues = JSON.parse(s.getAttribute('data-mids'));;\n        const maxValues = JSON.parse(s.getAttribute('data-maxs'));;\n\n    const data = {\n      labels,\n      datasets: [\n        {\n          label: 'Min',\n          data: minValues,\n          fill: '+1', // fill between this and next dataset\n          backgroundColor: 'rgba(75, 192, 192, 0.2)',\n          borderWidth: 0,\n          pointRadius: 0,\n          tension: 0.4,\n        },\n        {\n          label: 'Max',\n          data: maxValues,\n          fill: false, // no fill above\n          backgroundColor: 'rgba(75, 192, 192, 0.2)',\n          borderWidth: 0,\n          pointRadius: 0,\n          tension: 0.4,\n        },\n        {\n          label: 'Mid',\n          data: midValues,\n          borderColor: 'rgba(75, 75, 192, 1)',\n          backgroundColor: 'rgba(75, 75, 192, 0.1)',\n          borderWidth: 2,\n          pointRadius: 3,\n          fill: false,\n          tension: 0.4,\n        }\n      ]\n    };\n\n    const config = {\n      type: 'line',\n      data: data,\n      options: {\n        responsive: true,\n        interaction: {\n          mode: 'index',\n          intersect: false\n        },\n        stacked: false,\n        plugins: {\n          title: {\n            display: true,\n            text: 'Min/Max Area with Mid Line'\n          }\n        },\n        scales: {\n          x: {\n            type: 'time',\n            time: {\n              unit: 'month',\n              displayFormats: {\n                  month: 'MMM yy',\n            }\n            },\n            title: {\n              display: true,\n              text: 'Date'\n            }\n          },\n          y: {\n            title: {\n              display: true,\n              text: 'Value'\n            }\n          }\n        }\n      }\n    };\n\n    new Chart(document.getElementById('rangeChart'), config);\n  </script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" data-mids=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(templ.JSONString(mids))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 17, Col: 147}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" data-maxs=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var7 string
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(templ.JSONString(maxs))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 17, Col: 184}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\"></script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -109,12 +143,25 @@ func SimpleForm() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var6 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var6 == nil {
-			templ_7745c5c3_Var6 = templ.NopComponent
+		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var8 == nil {
+			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<form hx-post=\"/a/simple-prediction\" hx-swap=\"none\"><div class=\"mb-2\"><label for=\"initialBalance\">Initial Balance</label> <input class=\"uk-input\" name=\"initialBalance\" id=\"initialBalance\" type=\"number\"></div><div class=\"mb-2\"><label for=\"monthlyIncome\">Monthly Income</label> <input class=\"uk-input\" name=\"monthlyIncome\" id=\"monthlyIncome\" type=\"number\"></div><div class=\"mb-2\"><label for=\"monthlyExpenses\">Monthly Expenses</label> <input class=\"uk-input\" name=\"monthlyExpenses\" id=\"monthlyExpenses\" type=\"number\"></div><div class=\"mb-2\"><label for=\"expensesConfidence\">Expenses Confidence</label> <input class=\"uk-input\" name=\"expensesConfidence\" id=\"expensesConfidence\" type=\"number\"></div><div><button class=\"uk-btn uk-btn-primary w-full\">Calculate</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<form hx-post=\"/a/simple-prediction\" hx-target=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs("#" + string(IdChart))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 23, Col: 35}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-swap=\"innerHTML\"><div class=\"mb-2\"><label for=\"initialBalance\">Initial Balance</label> <input class=\"uk-input\" name=\"initialBalance\" id=\"initialBalance\" type=\"number\"></div><div class=\"mb-2\"><label for=\"monthlyIncome\">Monthly Income</label> <input class=\"uk-input\" name=\"monthlyIncome\" id=\"monthlyIncome\" type=\"number\"></div><div class=\"mb-2\"><label for=\"monthlyExpenses\">Monthly Expenses</label> <input class=\"uk-input\" name=\"monthlyExpenses\" id=\"monthlyExpenses\" type=\"number\"></div><div class=\"mb-2\"><label for=\"expensesConfidence\">Expenses Confidence</label> <input class=\"uk-input\" name=\"expensesConfidence\" id=\"expensesConfidence\" type=\"number\"></div><div><button class=\"uk-btn uk-btn-primary w-full\">Calculate</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -138,38 +185,38 @@ func Prediction(minDist, maxDist string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var7 == nil {
-			templ_7745c5c3_Var7 = templ.NopComponent
+		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var10 == nil {
+			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div><p>Expected end range is: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div><p>Expected end range is: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(minDist)
+		var templ_7745c5c3_Var11 string
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(minDist)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 149, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 72, Col: 37}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " - ")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var9 string
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(maxDist)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 149, Col: 51}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, " - ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</p></div>")
+		var templ_7745c5c3_Var12 string
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(maxDist)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 72, Col: 51}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</p></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -193,12 +240,12 @@ func SimplePrediction() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var10 == nil {
-			templ_7745c5c3_Var10 = templ.NopComponent
+		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var13 == nil {
+			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<header class=\"flex justify-between items-center p-6\"><h1 class=\"text-2xl font-semibold tracking-tight\">RUNWAY</h1><nav class=\"space-x-4\"><a href=\"/a/logout\" class=\"text-sm font-medium hover:underline\">Logout</a></nav></header><main class=\"px-6 py-4\"><div class=\"max-w-3xl text-center pb-12\"><h2 class=\"text-4xl sm:text-5xl font-bold tracking-tight leading-tight\">You are now super logged in!</h2></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<header class=\"flex justify-between items-center p-6\"><h1 class=\"text-2xl font-semibold tracking-tight\">RUNWAY</h1><nav class=\"space-x-4\"><a href=\"/a/logout\" class=\"text-sm font-medium hover:underline\">Logout</a></nav></header><main class=\"px-6 py-4\"><div class=\"max-w-3xl text-center pb-12\"><h2 class=\"text-4xl sm:text-5xl font-bold tracking-tight leading-tight\">You are now super logged in!</h2></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -206,7 +253,59 @@ func SimplePrediction() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div id=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var14 string
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(string(IdChart))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 90, Col: 27}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\"></div><script data-target=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var15 string
+		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(string(IdChart))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 91, Col: 39}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" data-data=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var16 string
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(string(IdChartData))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 91, Col: 73}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" data-canvas=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var17 string
+		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(string(IdChartCanvas))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 91, Col: 111}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\">\n          let chartInstance = null;\n\n          let target = document.currentScript.dataset.target;\n          let targetData = document.currentScript.dataset.data;\n          let targetCanvas = document.currentScript.dataset.canvas;\n\n          document.body.addEventListener(\"htmx:afterSwap\", (e) => {\n            if (!document.getElementById(target)) return; \n\n            const s = document.getElementById(targetData);\n            if (!s) return;\n\n            const labels = JSON.parse(s.dataset.labels);\n            const minValues = JSON.parse(s.dataset.mins);\n            const midValues = JSON.parse(s.dataset.mids);\n            const maxValues = JSON.parse(s.dataset.maxs);\n\n            const data = {\n              labels,\n              datasets: [\n                {\n                  label: 'Min',\n                  data: minValues,\n                  fill: '+1',\n                  backgroundColor: 'rgba(75, 192, 192, 0.2)',\n                  borderWidth: 0,\n                  pointRadius: 0,\n                  tension: 0.4,\n                },\n                {\n                  label: 'Max',\n                  data: maxValues,\n                  fill: false,\n                  backgroundColor: 'rgba(75, 192, 192, 0.2)',\n                  borderWidth: 0,\n                  pointRadius: 0,\n                  tension: 0.4,\n                },\n                {\n                  label: 'Mid',\n                  data: midValues,\n                  borderColor: 'rgba(75, 75, 192, 1)',\n                  backgroundColor: 'rgba(75, 75, 192, 0.1)',\n                  borderWidth: 2,\n                  pointRadius: 3,\n                  fill: false,\n                  tension: 0.4,\n                }\n              ]\n            };\n\n            const config = {\n              type: 'line',\n              data: data,\n              options: {\n                responsive: true,\n                interaction: { mode: 'index', intersect: false },\n                stacked: false,\n                plugins: {\n                  title: {\n                    display: true,\n                    text: 'Min/Max Area with Mid Line'\n                  }\n                },\n                scales: {\n                  x: {\n                    type: 'time',\n                    time: {\n                      unit: 'month',\n                      displayFormats: { month: 'MMM yy' }\n                    },\n                    title: { display: true, text: 'Date' }\n                  },\n                  y: {\n                    title: { display: true, text: 'Value' }\n                  }\n                }\n              }\n            };\n\n            if (chartInstance) {\n              chartInstance.destroy(); // avoid duplicate chart\n            }\n\n            const ctx = document.getElementById(targetCanvas);\n            chartInstance = new Chart(ctx, config);\n          });\n        </script><script src=\"https://cdn.jsdelivr.net/npm/chart.js\"></script><script src=\"https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js\"></script><script src=\"https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon\"></script></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -230,12 +329,12 @@ func SimplePredictionPage(cmp templ.Component) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var11 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var11 == nil {
-			templ_7745c5c3_Var11 = templ.NopComponent
+		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var18 == nil {
+			templ_7745c5c3_Var18 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Var12 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var19 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 			if !templ_7745c5c3_IsBuffer {
@@ -253,7 +352,7 @@ func SimplePredictionPage(cmp templ.Component) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = layout.Base().Render(templ.WithChildren(ctx, templ_7745c5c3_Var12), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = layout.Base().Render(templ.WithChildren(ctx, templ_7745c5c3_Var19), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
