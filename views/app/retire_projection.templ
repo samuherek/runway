@@ -1,0 +1,91 @@
+package app 
+
+import (
+	"runway/views/layout"
+)
+
+type RetirePredictPage string
+
+const (
+	IdResult RetirePredictPage = "retire-project-result"
+)
+
+templ RetireResult() {
+	<div>
+		<p>Hellow</p>
+	</div>
+}
+
+templ RetireProjectForm() {
+	<form
+		hx-post="/a/retire-projection"
+		hx-target={ "#" + string(IdResult) }
+		hx-swap="innerHTML"
+	>
+		<div class="mb-2">
+			<label for="monthlyExpenses">Current monthly Expenses</label>
+			<input
+				class="uk-input"
+				name="monthlyExpenses"
+				id="monthlyExpenses"
+				type="number"
+			/>
+		</div>
+		<div class="mb-2">
+			<label for="yearsUntilRetirement">Years until retirement</label>
+			<input
+				class="uk-input"
+				name="yearsUntilRetirement"
+				id="yearsUntilRetirement"
+				type="number"
+			/>
+		</div>
+		<div class="mb-2">
+			<label for="withdrawalYears">Withdrawal years</label>
+			<input
+				class="uk-input"
+				name="withdrawalYears"
+				id="withdrawalYears"
+				type="number"
+			/>
+		</div>
+		<div class="mb-2">
+			<label for="currentSavings">Current Savings</label>
+			<input
+				class="uk-input"
+				name="currentSavings"
+				id="currentSavings"
+				type="number"
+			/>
+		</div>
+		<div>
+			<button class="uk-btn uk-btn-primary w-full">
+				Calculate
+			</button>
+		</div>
+	</form>
+}
+
+templ RetireProjection() {
+	<header class="flex justify-between items-center p-6">
+		<h1 class="text-2xl font-semibold tracking-tight">RUNWAY</h1>
+		<nav class="space-x-4">
+			<a href="/a/logout" class="text-sm font-medium hover:underline">Logout</a>
+		</nav>
+	</header>
+	<main class="px-6 py-4">
+		<div class="max-w-3xl text-center pb-12">
+			<h2 class="text-4xl sm:text-5xl font-bold tracking-tight leading-tight">
+				You are now super logged in!
+			</h2>
+		</div>
+		@RetireProjectForm()
+		<div id={ string(IdResult) }></div>
+	</main>
+}
+
+templ RetireProjectionPage(cmp templ.Component) {
+	@layout.Base() {
+		@cmp
+	}
+}

@@ -69,6 +69,8 @@ func main() {
 	a.GET("", appH.Home)
 	a.GET("/simple-prediction", appH.GetSimplePrediction)
 	a.POST("/simple-prediction", appH.PostSimplePrediction)
+	a.GET("/retire-projection", appH.GetRetireProjection)
+	a.POST("/retire-projection", appH.PostRetireProjection)
 	a.GET("/logout", authH.GetLogout)
 	a.GET("/*", func(c echo.Context) error {
 		return c.Redirect(http.StatusFound, "/a")

@@ -55,8 +55,6 @@ func (h *AppHandler) PostSimplePrediction(c echo.Context) error {
 		return validationResponse(c, n, intoValidationMessages(err))
 	}
 
-	fmt.Printf("Params %v\n", params)
-
 	if params.ExpensesConfidence == 0 {
 		params.ExpensesConfidence = 0.8
 	}
@@ -106,4 +104,51 @@ func (h *AppHandler) PostSimplePrediction(c echo.Context) error {
 	}
 
 	return renderView(c, app.Chart(dates, mins, mids, maxs))
+}
+
+func (h *AppHandler) GetRetireProjection(c echo.Context) error {
+	return renderView(c, app.RetireProjectionPage(app.RetireProjection()))
+}
+
+type PostRetireProjection struct {
+	MonthlyExpenses      float64 `form:"monthlyExpenses" validate:"required,min=1"`
+	YearsUntilRetirement int     `form:"yearsUntilRetirement" validate:"required,min=1"`
+	WithdrawalYears      int     `form:"withdrawalYears" validate:"required,min=1"`
+	CurrentSavings       float64 `form:"currentSavings" validate:"required,min=0"`
+}
+
+func (h *AppHandler) PostRetireProjection(c echo.Context) error {
+	var params PostRetireProjection
+	n := notifications.NewNotifications()
+
+	if !isHxReq(c) {
+		return notHxResponse(c, n)
+	}
+
+	if err := c.Bind(&params); err != nil {
+		log.Error().Err(err).Msg("Failed input binding")
+		return unexpectedErrResponse(c, n)
+	}
+
+	fmt.Printf("Params %v\n", params)
+	if err := c.Validate(&params); err != nil {
+		return validationResponse(c, n, intoValidationMessages(err))
+	}
+
+	input := engine.RetirementInput{
+		MonthlyExpenseToday:  params.MonthlyExpenses,
+		YearsUntilRetirement: params.YearsUntilRetirement,
+		InflationRate:        0.03,
+		WithdrawalYears:      params.WithdrawalYears,
+		CurrentSavings:       params.CurrentSavings,
+	}
+
+	data := engine.ProjectRetirement(input)
+
+	fmt.Printf("Monthly expense at retirement start (in future €): %.2f\n", data.MonthlyExpenseAtStart)
+	fmt.Printf("Total required funds at retirement (future €): %.2f\n", data.TotalRequiredFutureFund)
+	fmt.Printf("Total required funds in today's money: %.2f\n", data.TotalRequiredPresentValueFund)
+	fmt.Printf("Current savings coverage (%% of required present value): %.2f%%\n", data.CurrentCoveragePercentage)
+
+	return renderView(c, app.RetireResult())
 }
