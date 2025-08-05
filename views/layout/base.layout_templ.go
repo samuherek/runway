@@ -77,80 +77,15 @@ func Base() templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/static/js/hyperscript%s.org@0.9.13.js", hash))
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/static/js/main%s.js", hash))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/layout/base.layout.templ`, Line: 31, Col: 76}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/layout/base.layout.templ`, Line: 31, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"></script><script src=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/static/js/franken2%s.core.iife.js", hash))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/layout/base.layout.templ`, Line: 32, Col: 72}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" type=\"module\"></script><script src=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/static/js/franken2%s.icon.iife.js", hash))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/layout/base.layout.templ`, Line: 33, Col: 72}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" type=\"module\"></script><script src=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/static/js/sweetalert2%s.min.js", hash))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/layout/base.layout.templ`, Line: 34, Col: 69}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\"></script><script src=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/static/js/sortable%s.js", hash))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/layout/base.layout.templ`, Line: 35, Col: 62}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\"></script><script src=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var9 string
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/static/js/main%s.js", hash))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/layout/base.layout.templ`, Line: 36, Col: 58}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"></script><script>\n                  const htmlElement = document.documentElement;\n\n                  const __FRANKEN__ = JSON.parse(\n                    localStorage.getItem(\"__FRANKEN__\") || \"{}\",\n                  );\n\n                  if (\n                    __FRANKEN__.mode === \"dark\" ||\n                    (!__FRANKEN__.mode &&\n                      window.matchMedia(\"(prefers-color-scheme: dark)\").matches)\n                  ) {\n                    htmlElement.classList.add(\"dark\");\n                  } else {\n                    htmlElement.classList.remove(\"dark\");\n                  }\n\n                  htmlElement.classList.add(__FRANKEN__.theme || \"uk-theme-emerald\");\n                  htmlElement.classList.add(__FRANKEN__.radii || \"uk-radii-none\");\n                  htmlElement.classList.add(__FRANKEN__.shadows || \"uk-shadows-sm\");\n                  htmlElement.classList.add(__FRANKEN__.font || \"uk-font-sm\");\n            </script></head><body class=\"bg-background text-foreground sample-transition\" hx-boost=\"true\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"></script><script src=\"https://cdn.jsdelivr.net/npm/franken-ui@2.1.0-next.18/dist/js/core.iife.js\" type=\"module\"></script><script src=\"https://cdn.jsdelivr.net/npm/franken-ui@2.1.0-next.18/dist/js/icon.iife.js\" type=\"module\"></script><script>\n                  const htmlElement = document.documentElement;\n\n                  const __FRANKEN__ = JSON.parse(\n                    localStorage.getItem(\"__FRANKEN__\") || \"{}\",\n                  );\n\n                  if (\n                    __FRANKEN__.mode === \"dark\" ||\n                    (!__FRANKEN__.mode &&\n                      window.matchMedia(\"(prefers-color-scheme: dark)\").matches)\n                  ) {\n                    htmlElement.classList.add(\"dark\");\n                  } else {\n                    htmlElement.classList.remove(\"dark\");\n                  }\n\n                  htmlElement.classList.add(__FRANKEN__.theme || \"uk-theme-emerald\");\n                  htmlElement.classList.add(__FRANKEN__.radii || \"uk-radii-none\");\n                  htmlElement.classList.add(__FRANKEN__.shadows || \"uk-shadows-sm\");\n                  htmlElement.classList.add(__FRANKEN__.font || \"uk-font-sm\");\n            </script></head><body class=\"bg-background text-foreground sample-transition\" hx-boost=\"true\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -158,7 +93,7 @@ func Base() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

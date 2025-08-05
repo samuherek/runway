@@ -114,7 +114,7 @@ func SimpleForm() templ.Component {
 			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<form><div class=\"mb-2\"><label for=\"initialBalance\">Initial Balance</label> <input class=\"uk-input\" name=\"initialBalance\" id=\"initialBalance\" type=\"number\"></div><div class=\"mb-2\"><label for=\"monthlyIncome\">Monthly Income</label> <input class=\"uk-input\" name=\"monthlyIncome\" id=\"monthlyIncome\" type=\"number\"></div><div class=\"mb-2\"><label for=\"monthlyExpenses\">Monthly Expenses</label> <input class=\"uk-input\" name=\"monthlyExpenses\" id=\"monthlyExpenses\" type=\"number\"></div><div class=\"mb-2\"><label for=\"expensesConfidence\">Expenses Confidence</label> <input class=\"uk-input\" name=\"expensesConfidence\" id=\"expensesConfidence\" type=\"number\"></div><div><button class=\"uk-btn uk-btn-primary w-full\">Calculate</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<form hx-post=\"/a/simple-prediction\" hx-swap=\"none\"><div class=\"mb-2\"><label for=\"initialBalance\">Initial Balance</label> <input class=\"uk-input\" name=\"initialBalance\" id=\"initialBalance\" type=\"number\"></div><div class=\"mb-2\"><label for=\"monthlyIncome\">Monthly Income</label> <input class=\"uk-input\" name=\"monthlyIncome\" id=\"monthlyIncome\" type=\"number\"></div><div class=\"mb-2\"><label for=\"monthlyExpenses\">Monthly Expenses</label> <input class=\"uk-input\" name=\"monthlyExpenses\" id=\"monthlyExpenses\" type=\"number\"></div><div class=\"mb-2\"><label for=\"expensesConfidence\">Expenses Confidence</label> <input class=\"uk-input\" name=\"expensesConfidence\" id=\"expensesConfidence\" type=\"number\"></div><div><button class=\"uk-btn uk-btn-primary w-full\">Calculate</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -150,7 +150,7 @@ func Prediction(minDist, maxDist string) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(minDist)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 146, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 149, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -163,7 +163,7 @@ func Prediction(minDist, maxDist string) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(maxDist)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 146, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/app/simple_prediction.templ`, Line: 149, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {

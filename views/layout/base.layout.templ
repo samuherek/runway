@@ -28,12 +28,9 @@ templ Base() {
 			<link rel="shortcut icon" href="/static/img/templ.png" type="image/png"/>
 			<link rel="stylesheet" href={ fmt.Sprintf("/static/css/main%s.css", hash) } type="text/css"/>
 			<script src={ fmt.Sprintf("/static/js/htmx%s.min.js", hash) }></script>
-			<script src={ fmt.Sprintf("/static/js/hyperscript%s.org@0.9.13.js", hash) }></script>
-			<script src={ fmt.Sprintf("/static/js/franken2%s.core.iife.js", hash) } type="module"></script>
-			<script src={ fmt.Sprintf("/static/js/franken2%s.icon.iife.js", hash) } type="module"></script>
-			<script src={ fmt.Sprintf("/static/js/sweetalert2%s.min.js", hash) }></script>
-			<script src={ fmt.Sprintf("/static/js/sortable%s.js", hash) }></script>
 			<script src={ fmt.Sprintf("/static/js/main%s.js", hash) }></script>
+			<script src="https://cdn.jsdelivr.net/npm/franken-ui@2.1.0-next.18/dist/js/core.iife.js" type="module"></script>
+			<script src="https://cdn.jsdelivr.net/npm/franken-ui@2.1.0-next.18/dist/js/icon.iife.js" type="module"></script>
 			<script>
                   const htmlElement = document.documentElement;
 

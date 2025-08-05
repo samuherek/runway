@@ -96,7 +96,10 @@ templ Chart(dates []string, mins, mids, maxs []float64) {
 }
 
 templ SimpleForm() {
-	<form>
+	<form
+		hx-post="/a/simple-prediction"
+		hx-swap="none"
+	>
 		<div class="mb-2">
 			<label for="initialBalance">Initial Balance</label>
 			<input
