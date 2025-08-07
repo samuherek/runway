@@ -1,6 +1,9 @@
 package engine
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // type ScenarioSettings struct {
 // 	BaseInflationRate       float64
@@ -79,22 +82,71 @@ func (s *SimpleRetirementInput) IntoSimulationState() SimulationState {
 	}
 }
 
-// type RetirementQueryResult struct {
-// 	RequiredSavingsAtRetirement          float64
-// 	RequiredSavingsTodayWithoutInflation float64
-// 	SavingsAchieved                      float64
-// 	Shortfall                            float64
-// 	AdditionalMonthlySavingsRequired     float64
-// 	CanReachGoal                         bool
-// }
-//
-// func QueryRetirementPlan(history []MonthlySnapshot, input RetirementInput) RetirementQueryResult {
+type RetirementQueryResult struct {
+	RequiredSavingsAtRetirement          float64
+	RequiredSavingsTodayWithoutInflation float64
+	CashAtRetireTime                     float64
+	CashToRetireDiff                     float64
+}
+
+func QueryRetirementPlan(history []MonthlySnapshot, input SimpleRetirementInput) RetirementQueryResult {
+	retirementMonth := input.YearsToRetirement * 12
+	retirementDurationMonths := input.YearsInRetirement * 12
+	retirementEnd := retirementMonth + retirementDurationMonths
+
+	fmt.Printf("RES: %v\n", history[retirementMonth].Expense)
+
+	retirementPrice := 0.0
+	for offset := retirementMonth; offset < retirementEnd; offset++ {
+		if offset >= 0 && offset < len(history) {
+			retirementPrice += history[offset].Expense
+		}
+	}
+
+	accInflationAtRetireTime := 1.0
+	for i := 0; i < retirementMonth; i++ {
+		if i < len(history) {
+			accInflationAtRetireTime *= 1 + history[i].Inflation
+		}
+	}
+
+	retirementPriceToday := retirementPrice / accInflationAtRetireTime
+
+	totalIncomeAtRetire := 0.0
+	totalExpenseAtRetire := 0.0
+	totalNetDiffAtRetire := 0.0
+	for i := 0; i < retirementMonth; i++ {
+		if i < len(history) {
+			totalIncomeAtRetire += history[i].Income
+			totalExpenseAtRetire += history[i].Expense
+			totalNetDiffAtRetire += history[i].NetChange
+		}
+	}
+
+	cashAtRetireTime := history[retirementMonth].NetWorth
+	cashToRetireDiff := cashAtRetireTime - retirementPrice
+
+	fmt.Printf("Total income at retire: %.2f\n", totalIncomeAtRetire)
+	fmt.Printf("Total expense at retire: %.2f\n", totalExpenseAtRetire)
+	fmt.Printf("Total retire price: %.2f\n", retirementPrice)
+	fmt.Printf("Net worth at retire: %.2f\n", history[retirementMonth].NetWorth)
+	fmt.Printf("Cash diff: %.2f\n", cashToRetireDiff)
+
+	return RetirementQueryResult{
+		RequiredSavingsAtRetirement:          retirementPrice,
+		RequiredSavingsTodayWithoutInflation: retirementPriceToday, // since no growth, this is the same
+		CashAtRetireTime:                     cashAtRetireTime,
+		CashToRetireDiff:                     cashToRetireDiff,
+	}
+}
+
+// func QueryRetirementPlan(history []MonthlySnapshot, input SimpleRetirementInput) RetirementQueryResult {
 // 	retirementMonth := input.YearsToRetirement * 12
 // 	endMonth := retirementMonth + input.YearsInRetirement*12
 //
 // 	// Step 1: Calculate total retirement need at retirement start
 // 	// Present value of 20 years of expenses, inflation-adjusted
-// 	monthlyRealExpense := input.MonthlyExpenses * math.Pow(1+input.InflationRate, float64(input.YearsToRetirement))
+// 	monthlyRealExpense := input.MonthlyExpense * math.Pow(1+input.InflationRate, float64(input.YearsToRetirement))
 // 	monthlyRate := input.ExpectedReturnRate / 12
 // 	n := float64(input.YearsInRetirement * 12)
 //
@@ -123,7 +175,7 @@ func (s *SimpleRetirementInput) IntoSimulationState() SimulationState {
 // 		CanReachGoal:                         shortfall <= 0,
 // 	}
 // }
-//
+
 // func sumAssetValueAtMonth(history []MonthlySnapshot, month int) float64 {
 // 	if month >= len(history) {
 // 		return 0

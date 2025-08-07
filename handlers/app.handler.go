@@ -181,8 +181,10 @@ func (h *AppHandler) PostRetireProjection(c echo.Context) error {
 	totalMonths := (input.YearsToRetirement + input.YearsInRetirement) * 12
 	state := input.IntoSimulationState()
 	history := engine.SimulateFinancialLife(state, totalMonths)
+	answer := engine.QueryRetirementPlan(history, input)
 
-	fmt.Printf("HISTORY: %v\n", history)
+	// fmt.Printf("HISTORY: %v\n", history)
+	fmt.Printf("RETIREMENT: %v\n", answer)
 
 	// sim := engine
 	// projection := engine.ProjectRetirement(input)

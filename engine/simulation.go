@@ -168,8 +168,8 @@ func (s *SimulationState) currYear() int {
 
 func (s *SimulationState) sumIncomes() float64 {
 	total := 0.0
-	for _, i := range s.Incomes {
-		total += i.Amount
+	for i := range s.Incomes {
+		total += s.Incomes[i].Amount
 	}
 
 	return total
@@ -177,8 +177,8 @@ func (s *SimulationState) sumIncomes() float64 {
 
 func (s *SimulationState) sumExpenses() float64 {
 	total := 0.0
-	for _, e := range s.Expenses {
-		total += e.Amount
+	for i := range s.Expenses {
+		total += s.Expenses[i].Amount
 	}
 
 	return total
@@ -186,8 +186,8 @@ func (s *SimulationState) sumExpenses() float64 {
 
 func (s *SimulationState) sumAssets() float64 {
 	total := 0.0
-	for _, a := range s.Assets {
-		total += a.Amount
+	for i := range s.Assets {
+		total += s.Assets[i].Amount
 	}
 
 	return total
@@ -329,39 +329,38 @@ func cleanupInflation(s *SimulationState) {
 }
 
 func cleanupExpired(s *SimulationState) {
-	assets := s.Assets
-	filteredAssetes := assets[:0]
-
-	for _, el := range assets {
+	oldAssets := s.Assets
+	s.Assets = s.Assets[:0]
+	for _, el := range oldAssets {
 		if !isExpired(s.MonthIndex, el.EndMonthIndex) {
-			filteredAssetes = append(filteredAssetes, el)
+			s.Assets = append(s.Assets, el)
 		}
 	}
 
-	expenses := s.Expenses
-	filteredExpenses := expenses[:0]
+	oldExpenses := s.Expenses
+	s.Expenses = s.Expenses[:0]
 
-	for _, el := range expenses {
+	for _, el := range oldExpenses {
 		if !isExpired(s.MonthIndex, el.EndMonthIndex) {
-			filteredExpenses = append(filteredExpenses, el)
+			s.Expenses = append(s.Expenses, el)
 		}
 	}
 
-	incomes := s.Incomes
-	filteredIncomes := incomes[:0]
+	oldIncomes := s.Incomes
+	s.Incomes = s.Incomes[:0]
 
-	for _, el := range incomes {
+	for _, el := range oldIncomes {
 		if !isExpired(s.MonthIndex, el.EndMonthIndex) {
-			filteredIncomes = append(filteredIncomes, el)
+			s.Incomes = append(s.Incomes, el)
 		}
 	}
 
-	liabilities := s.Liabilities
-	filteredLiabilities := liabilities[:0]
+	oldLiabilities := s.Liabilities
+	s.Liabilities = s.Liabilities[:0]
 
-	for _, el := range liabilities {
+	for _, el := range oldLiabilities {
 		if !isExpired(s.MonthIndex, el.EndMonthIndex) {
-			filteredLiabilities = append(filteredLiabilities, el)
+			s.Liabilities = append(s.Liabilities, el)
 		}
 	}
 }
@@ -377,16 +376,16 @@ func simulate(state *SimulationState, month int) {
 	// Apply asset changes
 	// Apply income changes
 
-	for _, a := range state.Assets {
-		applyAssetChange(&a, state)
+	for i := range state.Assets {
+		applyAssetChange(&state.Assets[i], state)
 	}
 
-	for _, i := range state.Incomes {
-		applyIncomeChange(&i, state)
+	for i := range state.Incomes {
+		applyIncomeChange(&state.Incomes[i], state)
 	}
 
-	for _, e := range state.Expenses {
-		applyExpenseChange(&e, state)
+	for i := range state.Expenses {
+		applyExpenseChange(&state.Expenses[i], state)
 	}
 
 	// Create snaphost from state
