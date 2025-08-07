@@ -144,7 +144,7 @@ func RetirementProjectionResult(input RetirementInput, projection RetirementProj
 	rest := projection.TotalRequiredFutureFund
 	for i, v := range projection.MonthlyValues {
 		rest -= v
-		year := i / 12
+		year := data.YearsUntilRetirement + (i / 12)
 		month := i % 12
 		data.FutureFundWithdrawals = append(data.FutureFundWithdrawals, FundPoint{
 			Date:  time.Now().AddDate(year, month, 0),

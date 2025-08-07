@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
 	"runway/db"
 	"runway/engine"
 	"runway/services/notifications"
@@ -118,6 +119,40 @@ type PostRetireProjection struct {
 	CurrentSavings       float64 `form:"currentSavings" validate:"required,min=0"`
 }
 
+//
+// func (h *AppHandler) PostRetireProjection(c echo.Context) error {
+// 	var params PostRetireProjection
+// 	n := notifications.NewNotifications()
+//
+// 	if !isHxReq(c) {
+// 		return notHxResponse(c, n)
+// 	}
+//
+// 	if err := c.Bind(&params); err != nil {
+// 		log.Error().Err(err).Msg("Failed input binding")
+// 		return unexpectedErrResponse(c, n)
+// 	}
+//
+// 	fmt.Printf("Params %v\n", params)
+// 	if err := c.Validate(&params); err != nil {
+// 		return validationResponse(c, n, intoValidationMessages(err))
+// 	}
+//
+// 	input := engine.RetirementInput{
+// 		MonthlyExpenseToday:  params.MonthlyExpenses,
+// 		MonthlyIncome:        params.MonthlyIncome,
+// 		YearsUntilRetirement: params.YearsUntilRetirement,
+// 		InflationRate:        0.03,
+// 		WithdrawalYears:      params.WithdrawalYears,
+// 		CurrentSavings:       params.CurrentSavings,
+// 	}
+//
+// 	projection := engine.ProjectRetirement(input)
+// 	data := engine.RetirementProjectionResult(input, projection)
+//
+// 	return renderView(c, app.RetireResult(data))
+// }
+
 func (h *AppHandler) PostRetireProjection(c echo.Context) error {
 	var params PostRetireProjection
 	n := notifications.NewNotifications()
@@ -136,17 +171,23 @@ func (h *AppHandler) PostRetireProjection(c echo.Context) error {
 		return validationResponse(c, n, intoValidationMessages(err))
 	}
 
-	input := engine.RetirementInput{
-		MonthlyExpenseToday:  params.MonthlyExpenses,
-		MonthlyIncome:        params.MonthlyIncome,
-		YearsUntilRetirement: params.YearsUntilRetirement,
-		InflationRate:        0.03,
-		WithdrawalYears:      params.WithdrawalYears,
-		CurrentSavings:       params.CurrentSavings,
+	input := engine.SimpleRetirementInput{
+		MonthlyExpense:    params.MonthlyExpenses,
+		Income:            params.MonthlyIncome,
+		YearsToRetirement: params.YearsUntilRetirement,
+		YearsInRetirement: params.WithdrawalYears,
+		Cash:              params.CurrentSavings,
 	}
+	totalMonths := (input.YearsToRetirement + input.YearsInRetirement) * 12
+	state := input.IntoSimulationState()
+	history := engine.SimulateFinancialLife(state, totalMonths)
 
-	projection := engine.ProjectRetirement(input)
-	data := engine.RetirementProjectionResult(input, projection)
+	fmt.Printf("HISTORY: %v\n", history)
 
-	return renderView(c, app.RetireResult(data))
+	// sim := engine
+	// projection := engine.ProjectRetirement(input)
+	// data := engine.RetirementProjectionResult(input, projection)
+
+	return c.NoContent(http.StatusAccepted)
+	// return renderView(c, app.RetireResult(data))
 }
