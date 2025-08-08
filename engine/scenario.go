@@ -3,6 +3,8 @@ package engine
 import (
 	"fmt"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 // type ScenarioSettings struct {
@@ -22,6 +24,18 @@ type SimpleRetirementInput struct {
 	YearsInRetirement int
 	Cash              float64
 	Income            float64
+}
+
+func (s *SimpleRetirementInput) GetRetirementStartMonthIndex() int {
+	return s.YearsToRetirement * 12
+}
+
+func (s *SimpleRetirementInput) GetRetirementMonthDuration() int {
+	return s.YearsInRetirement * 12
+}
+
+func (s *SimpleRetirementInput) GetRetirementEndMonthIndex() int {
+	return s.GetRetirementStartMonthIndex() + s.GetRetirementMonthDuration()
 }
 
 func (s *SimpleRetirementInput) IntoSimulationState() SimulationState {
@@ -89,52 +103,65 @@ type RetirementQueryResult struct {
 	CashToRetireDiff                     float64
 }
 
+// QueryExpenseRange accumulates the "Expense" field from start month index
+// to the end month index.
+func QueryExpenseRangeTotal(history []MonthlySnapshot, startIndex, endIndex int) float64 {
+	acc := 0.0
+	for i := startIndex; i < endIndex; i++ {
+		if i >= 0 && i < len(history) {
+			acc += history[i].Expense
+		}
+	}
+
+	return acc
+}
+
+// QueryInflationRangeTotal accumulates the "Inflation" field from start month index
+// to the end month index.
+func QueryInflationRangeTotal(history []MonthlySnapshot, startIndex, endIndex int) float64 {
+	acc := 1.0
+	for i := startIndex; i < endIndex; i++ {
+		if i >= 0 && i < len(history) {
+			acc *= 1 + history[i].Inflation
+		}
+	}
+
+	return acc
+}
+
+// QueryIncomeRangeTotal accumulates the "Income" field from start month index
+// to the end month index.
+func QueryIncomeRangeTotal(history []MonthlySnapshot, startIndex, endIndex int) float64 {
+	acc := 0.0
+	for i := startIndex; i < endIndex; i++ {
+		if i >= 0 && i < len(history) {
+			acc += history[i].Income
+		}
+	}
+
+	return acc
+}
+
 func QueryRetirementPlan(history []MonthlySnapshot, input SimpleRetirementInput) RetirementQueryResult {
-	retirementMonth := input.YearsToRetirement * 12
-	retirementDurationMonths := input.YearsInRetirement * 12
-	retirementEnd := retirementMonth + retirementDurationMonths
+	start := time.Now()
+
+	retirementMonth := input.GetRetirementStartMonthIndex()
+	retirementEnd := input.GetRetirementEndMonthIndex()
 
 	fmt.Printf("RES: %v\n", history[retirementMonth].Expense)
 
-	retirementPrice := 0.0
-	for offset := retirementMonth; offset < retirementEnd; offset++ {
-		if offset >= 0 && offset < len(history) {
-			retirementPrice += history[offset].Expense
-		}
-	}
-
-	accInflationAtRetireTime := 1.0
-	for i := 0; i < retirementMonth; i++ {
-		if i < len(history) {
-			accInflationAtRetireTime *= 1 + history[i].Inflation
-		}
-	}
-
+	retirementPrice := QueryExpenseRangeTotal(history, retirementMonth, retirementEnd)
+	accInflationAtRetireTime := QueryInflationRangeTotal(history, 0, retirementMonth)
 	retirementPriceToday := retirementPrice / accInflationAtRetireTime
-
-	totalIncomeAtRetire := 0.0
-	totalExpenseAtRetire := 0.0
-	totalNetDiffAtRetire := 0.0
-	for i := 0; i < retirementMonth; i++ {
-		if i < len(history) {
-			totalIncomeAtRetire += history[i].Income
-			totalExpenseAtRetire += history[i].Expense
-			totalNetDiffAtRetire += history[i].NetChange
-		}
-	}
 
 	cashAtRetireTime := history[retirementMonth].NetWorth
 	cashToRetireDiff := cashAtRetireTime - retirementPrice
 
-	fmt.Printf("Total income at retire: %.2f\n", totalIncomeAtRetire)
-	fmt.Printf("Total expense at retire: %.2f\n", totalExpenseAtRetire)
-	fmt.Printf("Total retire price: %.2f\n", retirementPrice)
-	fmt.Printf("Net worth at retire: %.2f\n", history[retirementMonth].NetWorth)
-	fmt.Printf("Cash diff: %.2f\n", cashToRetireDiff)
+	log.Info().Msg(fmt.Sprintf("Query: end in %s", time.Since(start)))
 
 	return RetirementQueryResult{
 		RequiredSavingsAtRetirement:          retirementPrice,
-		RequiredSavingsTodayWithoutInflation: retirementPriceToday, // since no growth, this is the same
+		RequiredSavingsTodayWithoutInflation: retirementPriceToday,
 		CashAtRetireTime:                     cashAtRetireTime,
 		CashToRetireDiff:                     cashToRetireDiff,
 	}
