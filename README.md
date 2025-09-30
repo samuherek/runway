@@ -37,3 +37,4 @@ Using `migrate` with necessary ENV variable `export POSTGRESQL_URL=postgres://po
 - Drop database `migrate --database ${POSTGRESQL_URL} -path db/migrations drop` 
 - Migrate up `migrate --database ${POSTGRESQL_URL} -path db/migrations up` 
 - Create migration `migrate create -ext sql -dir db/migrations -seq create_users_table`
+
