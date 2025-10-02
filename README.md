@@ -1,6 +1,6 @@
 # Runway
 
-The runway application for people to see how they are doing financialy into the future.
+The runway application for people to see how they are doing financialy into the future. :)
 
 ## To Run
 
